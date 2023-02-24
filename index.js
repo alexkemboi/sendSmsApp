@@ -9,20 +9,38 @@ const AfricasTalking = require("africastalking")(credentials);
 
 // Get the SMS service
 const sms = AfricasTalking.SMS;
+const express = require("express");
+const app = express();
+const bodyParser = require("body-parser");
 
-function sendMessage(message) {
+app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+// Add CORS middleware
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  next();
+});
+
+app.post("/sendText", (req, res) => {
+  const toNumber = req.body.toNumber;
+  const textMessage = req.body.textMessage;
+  // code to handle form data
   const options = {
     // Set the numbers you want to send to in international format
-    to: ["+254726837210"],
+    to: [toNumber],
     // Set your message
-    message: message,
+    message: textMessage,
     // Set your shortCode or senderId
     //from: 'XXYYZZ'
   };
 
   // That’s it, hit send and we’ll take care of the rest
   sms.send(options).then(console.log).catch(console.log);
-}
-const message = "Congratulations you sent your first message";
+});
 
-sendMessage(message);
+app.listen(3000, () => {
+  console.log("Server listening on port 3000");
+});
